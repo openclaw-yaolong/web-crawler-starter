@@ -59,11 +59,14 @@ def build_robots_parser(start_url: str, user_agent: str):
         return None, robots_url
 
 
-def crawl(start_url: str, max_pages: int = 20, delay: float = 0.5, retries: int = 2):
+def crawl(start_url: str, max_pages: int = 20, delay: float = 0.5, retries: int = 2, insecure: bool = False):
     ua = os.getenv("USER_AGENT", "web-crawler-starter/1.0")
     headers = {"User-Agent": ua}
 
     session = build_session(retries=retries)
+    if insecure:
+        session.verify = False
+        requests.packages.urllib3.disable_warnings()  # type: ignore[attr-defined]
     rp, robots_url = build_robots_parser(start_url, ua)
 
     visited = set()
@@ -157,9 +160,10 @@ def main():
     parser.add_argument("--max-pages", type=int, default=20)
     parser.add_argument("--delay", type=float, default=0.5)
     parser.add_argument("--retries", type=int, default=2)
+    parser.add_argument("--insecure", action="store_true", help="Disable SSL verification (debug only)")
     args = parser.parse_args()
 
-    result = crawl(args.start_url, args.max_pages, args.delay, args.retries)
+    result = crawl(args.start_url, args.max_pages, args.delay, args.retries, args.insecure)
 
     os.makedirs("output", exist_ok=True)
     out_json = "output/crawl_result.json"

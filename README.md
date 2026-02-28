@@ -18,6 +18,12 @@ pip install -r requirements.txt
 PYTHONPATH=src python -m crawler.main --start-url https://example.com --max-pages 20 --retries 2
 ```
 
+If your environment has broken CA chain (SSL verify issues), debug with:
+
+```bash
+PYTHONPATH=src python -m crawler.main --start-url https://example.com --max-pages 20 --retries 2 --insecure
+```
+
 ## Output
 Results are written to:
 - `output/crawl_result.json`
